@@ -55,7 +55,7 @@ fetch("https://beam.pro/api/v1/channels/" + username).then(function(res) {
         function setupRobotEvents (robot) {
             robot.on('report', report => {
                 if (report.tactile.length > 0) {
-                    check(report.tactile, robot);
+                    check(report.tactile, robot, report.tactile.length);
                 }
             });
             robot.on('error', err => {
@@ -66,7 +66,7 @@ fetch("https://beam.pro/api/v1/channels/" + username).then(function(res) {
   console.log(err);
 });
 var holding = [];
-function check(t, robot) {
+function check(t, robot, len) {
   t.forEach(i=>{ if(i.holding > holding[i.id]) {
      trigger(i.id, robot);
    }
@@ -75,14 +75,15 @@ function check(t, robot) {
  });
 }
 
-function trigger(id, robot) {
+function trigger(id, robot, len) {
   console.log("triggered: " + id);
   if (id === 0) {
     //rjs.keyTap("s", "control");
-    let json = {"tactile": [new Packets.ProgressUpdate.TactileUpdate({"id": id, "cooldown": 30000})]};
-    let update = Packets.ProgressUpdate(json);
-    console.log(update);
-    //robot.send(Packets.ProgressUpdate(json));
+    //cdAll(len);
+    let json = {tactile: [new Packets.ProgressUpdate.TactileUpdate({id: id, cooldown: 30000})]};
+    let update = new Packets.ProgressUpdate(json);
+    //console.log(update);
+    robot.send(update);
   }
   if (id === 1) {
     //rjs.keyTap(";");
